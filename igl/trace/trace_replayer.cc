@@ -291,6 +291,9 @@ void TraceReplayer::parseLine() {
 
       eof = file.eof();
       std::getline(file, line);
+      while(int(line.back()) == 13) {
+        line.pop_back();
+      }
     }
 
     if (eof) {
