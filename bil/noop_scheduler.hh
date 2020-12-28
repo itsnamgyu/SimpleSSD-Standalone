@@ -31,6 +31,8 @@ class NoopScheduler : public Scheduler {
   NoopScheduler(Engine &, DriverInterface *);
   ~NoopScheduler();
 
+  BIO *last_bio = nullptr;
+
   void init();
   void submitIO(BIO &);
 };

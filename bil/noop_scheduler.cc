@@ -21,14 +21,26 @@
 
 namespace BIL {
 
-NoopScheduler::NoopScheduler(Engine &e, DriverInterface *i) : Scheduler(e, i) {}
+NoopScheduler::NoopScheduler(Engine &e, DriverInterface *i) : Scheduler(e, i) {
+
+}
 
 NoopScheduler::~NoopScheduler() {}
 
 void NoopScheduler::init() {}
 
 void NoopScheduler::submitIO(BIO &bio) {
-  pInterface->submitIO(bio);
+  static int index = 0;
+  // TEMP
+  //printf("Submit tick %04d: %010ld\n", ++index, engine.getCurrentTick());
+  if (last_bio == nullptr) {
+    last_bio = new BIO(bio);
+  } else {
+    pInterface->submitIO(bio);
+    pInterface->submitIO(*last_bio);
+    delete last_bio;
+    last_bio = nullptr;
+  }
 }
 
 }  // namespace BIL
