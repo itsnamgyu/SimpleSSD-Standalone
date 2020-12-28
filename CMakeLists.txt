@@ -20,7 +20,7 @@ cmake_minimum_required(VERSION 3.10)
 project(simplessd-standalone)
 
 # Add options for debug build
-option(DEBUG_BUILD "Build SimpleSSD-Standalone in debug mode." OFF)
+option(DEBUG_BUILD "Build SimpleSSD-Standalone in debug mode." ON)
 
 # Set DRAMPower path
 set(DRAMPOWER_SOURCE_DIR
@@ -48,6 +48,16 @@ include_directories(
   ${DRAMPOWER_SOURCE_DIR}
 )
 
+find_package(Torch REQUIRED)  # NG
+
+message("${TORCH_CXX_FLAGS}")
+message("${TORCH_CXX_FLAGS}")
+message("${TORCH_CXX_FLAGS}")
+message("${TORCH_CXX_FLAGS}")
+message("${CMAKE_CXX_FLAGS}")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")  # [NG] add Torch
+
 # Platform specific settings
 if (MSVC)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
@@ -56,10 +66,10 @@ if (MSVC)
 else ()
   if (DEBUG_BUILD)
     set(CMAKE_CXX_FLAGS
-      "-O0 -g -rdynamic -pthread -Wall -Wextra -Werror ${CMAKE_CXX_FLAGS}")
+      "-O0 -g -rdynamic -pthread -Wall -Wextra -Werror ${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")  # [NG] add Torch
   else ()
     set(CMAKE_CXX_FLAGS
-      "-O2 -rdynamic -pthread -Wall -Wextra -Werror ${CMAKE_CXX_FLAGS}")
+      "-O2 -rdynamic -pthread -Wall -Wextra -Werror ${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")  # [NG] add Torch
   endif ()
 
   if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -70,7 +80,7 @@ Please update your compiler.")
   endif ()
 endif ()
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Specify source files
@@ -145,4 +155,5 @@ add_executable(simplessd-standalone
   ${SRC_SIM}
   ${SRC_UTIL}
 )
-target_link_libraries(simplessd-standalone simplessd)
+
+target_link_libraries(simplessd-standalone simplessd "${TORCH_LIBRARIES}")  # [NG] add Torch
