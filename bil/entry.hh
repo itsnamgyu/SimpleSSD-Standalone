@@ -50,6 +50,7 @@ typedef struct _BIO {
   BIO_TYPE type;
   uint64_t offset;
   uint64_t length;
+  uint64_t requestedAt;
 
   // I/O completion
   std::function<void(uint64_t)> callback;

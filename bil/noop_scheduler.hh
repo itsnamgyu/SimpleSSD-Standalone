@@ -31,10 +31,17 @@ class NoopScheduler : public Scheduler {
   NoopScheduler(Engine &, DriverInterface *);
   ~NoopScheduler();
 
-  BIO *last_bio = nullptr;
+  const uint64_t SCHEDULER_INTERVAL = 10UL * 1000UL * 1000UL;
+//  const uint64_t SCHEDULER_DEADLINE = 1000UL * 1000UL * 1000UL * 1000UL;
+  const uint64_t SCHEDULER_DEADLINE = 1UL * 1000UL * 1000UL;
+
+  uint64_t totalLogicalBlocks = 3072;  // [NG] Sample config
+  SimpleSSD::Event scheduleEvent;
+  std::vector<std::vector<BIO>> bioPool;
 
   void init();
   void submitIO(BIO &);
+  void invokeScheduler(uint64_t);
 };
 
 }  // namespace BIL
