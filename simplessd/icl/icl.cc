@@ -54,6 +54,16 @@ ICL::ICL(ConfigReader &c) : conf(c) {
     logicalPageSize = param->pageSize;
   }
 
+  printf("FTL (ICL) Stats [NG]\n");
+  printf("--------------------------------------------------------------------------------\n");
+  printf("totalLogicalBlocks                 %ld\n", param->totalLogicalBlocks);
+  printf("pagesInBlock                       %ld\n", param->pagesInBlock);
+  printf("ioUnitInPage                       %d\n", param->ioUnitInPage);
+  printf("pageSize                           %d\n", param->pageSize);
+  printf("totalLogicalPages                  %ld\n", totalLogicalPages);
+  printf("logicalPageSize                    %d\n", logicalPageSize);
+  printf("--------------------------------------------------------------------------------\n");
+
   pCache = new GenericCache(conf, pFTL, pDRAM);
 }
 

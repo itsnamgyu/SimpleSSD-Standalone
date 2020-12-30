@@ -218,6 +218,10 @@ int main(int argc, char *argv[]) {
     uint32_t bs;
 
     pInterface->getInfo(bytesize, bs);
+    printf("Main Stats [NG]\n");
+    printf("--------------------------------------------------------------------------------\n");
+    printf("Total Size:            %ld\n", bytesize);
+    printf("--------------------------------------------------------------------------------\n");
     pIOGen->init(bytesize, bs);
     pIOGen->begin();
   };
