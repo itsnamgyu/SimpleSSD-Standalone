@@ -33,6 +33,7 @@ class NoopScheduler : public Scheduler {
 
   BIO *last_bio = nullptr;
 
+  
   void init();
   void submitIO(BIO &);
 };

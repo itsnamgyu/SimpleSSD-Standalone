@@ -19,6 +19,7 @@
 
 #include "bil/noop_scheduler.hh"
 
+
 namespace BIL {
 
 NoopScheduler::NoopScheduler(Engine &e, DriverInterface *i) : Scheduler(e, i) {
@@ -27,12 +28,25 @@ NoopScheduler::NoopScheduler(Engine &e, DriverInterface *i) : Scheduler(e, i) {
 
 NoopScheduler::~NoopScheduler() {}
 
-void NoopScheduler::init() {}
+void NoopScheduler::invokeScheduler(uint64_t tick) {
+  printf("Scheduler function at %06ld\n", tick);
+}
+
+void NoopScheduler::init() {
+}
 
 void NoopScheduler::submitIO(BIO &bio) {
   static int index = 0;
-  // TEMP
-  //printf("Submit tick %04d: %010ld\n", ++index, engine.getCurrentTick());
+  const uint64_t logicalBlockSize = 3 << 27;
+  index++;
+  printf("--------------------------------------------------------------------------------\n");
+  printf("[%06ld] TYPE:         %s\n", bio.id, bio.type == BIO_READ ? "READ" : bio.type == BIO_WRITE ? "WRITE" : "OTHER");
+  printf("[%06ld] SUBMIT_TICK:  %010ld\n", bio.id, engine.getCurrentTick());
+  uint64_t startBlock = bio.offset / logicalBlockSize;
+  uint64_t endBlock = (bio.offset + bio.length) / logicalBlockSize;
+  printf("[%06ld] LBN:          %06ld - %06ld (%06ld)\n", bio.id, startBlock, endBlock, endBlock - startBlock + 1);
+  pInterface->submitIO(bio);
+  return;
   if (last_bio == nullptr) {
     last_bio = new BIO(bio);
   } else {
