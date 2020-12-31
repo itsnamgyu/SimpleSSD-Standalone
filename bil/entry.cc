@@ -90,7 +90,14 @@ void BlockIOEntry::completion(uint64_t id) {
       }
 
       if (pLatencyFile) {
-        *pLatencyFile << std::to_string(iter->id) << ", "
+        const char *typeString;
+        if (iter->type == BIO_READ) {
+          typeString = "R";
+        } else if (iter->type == BIO_WRITE) {
+          typeString = "W";
+        }
+        *pLatencyFile << typeString << ", "
+                      << std::to_string(iter->id) << ", "
                       << std::to_string(iter->offset) << ", "
                       << std::to_string(iter->length) << ", "
                       << std::to_string(tick) << std::endl;
