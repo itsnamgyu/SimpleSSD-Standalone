@@ -23,6 +23,8 @@
 
 #include "bil/interface.hh"
 #include "bil/noop_scheduler.hh"
+#include "bil/baseline_scheduler.hh"
+#include "bil/rl0_scheduler.hh"
 #include "simplessd/sim/trace.hh"
 
 namespace BIL {
@@ -45,6 +47,14 @@ BlockIOEntry::BlockIOEntry(ConfigReader &c, Engine &e, DriverInterface *i,
   switch (c.readUint(CONFIG_GLOBAL, GLOBAL_SCHEDULER)) {
     case SCHEDULER_NOOP:
       pScheduler = new NoopScheduler(e, i);
+
+      break;
+    case SCHEDULER_BASELINE:
+      pScheduler = new BaselineScheduler(e, i);
+
+      break;
+    case SCHEDULER_RL0:
+      pScheduler = new RL0Scheduler(e, i);
 
       break;
     default:

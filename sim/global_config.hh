@@ -53,6 +53,8 @@ typedef enum {
 
 typedef enum {
   SCHEDULER_NOOP,
+  SCHEDULER_BASELINE,
+  SCHEDULER_RL0,
   SCHEDULER_NUM,
 } SCHEDULER;
 

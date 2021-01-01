@@ -87,6 +87,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SRC_BIL
   bil/entry.cc
   bil/noop_scheduler.cc
+  bil/baseline_scheduler.cc
+  bil/rl0_scheduler.cc
 )
 set(SRC_IGL_REQUEST
   igl/request/request_config.cc

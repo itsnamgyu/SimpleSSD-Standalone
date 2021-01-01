@@ -24,28 +24,17 @@
 
 namespace BIL {
 
-NoopScheduler::NoopScheduler(Engine &e, DriverInterface *i) : Scheduler(e, i) {
-  schedulerEvent =
-      engine.allocateEvent([this](uint64_t tick) { invokeScheduler(tick); });
-}
+NoopScheduler::NoopScheduler(Engine &e, DriverInterface *i) : Scheduler(e, i) {}
 
 NoopScheduler::~NoopScheduler() {}
 
-void NoopScheduler::init() {
-  bioPool = std::vector<std::vector<BIO>>((int)totalLogicalBlocks,
-                                          std::vector<BIO>());
-  bioDeadline = std::vector<ulong>((int)totalLogicalBlocks, 0);
-}
+void NoopScheduler::init() {}
 
 void NoopScheduler::submitIO(BIO &bio) {
-  static int index = 0;
-  const uint64_t logicalBlockSize = 3 << 27;
   const uint64_t currentTick = engine.getCurrentTick();
 
-  bio.requestedAt = currentTick;
-  index++;
-  printf("---------------------------------------------------------------------"
-         "-----------\n");
+  printf("----------------------------------------");
+  printf("----------------------------------------\n");
   printf("[%06ld] TYPE:         %s\n", bio.id,
          bio.type == BIO_READ    ? "READ"
          : bio.type == BIO_WRITE ? "WRITE"
@@ -56,64 +45,7 @@ void NoopScheduler::submitIO(BIO &bio) {
   printf("[%06ld] LBN:          %06ld - %06ld (%06ld)\n", bio.id, startBlock,
          endBlock, endBlock - startBlock + 1);
 
-  if (bio.type == BIO_READ) {
-    pInterface->submitIO(bio);
-  }
-  else {  // BIO_WRITE
-    const uint64_t logicalBlockIndex = bio.offset / logicalBlockSize;
-    assert(logicalBlockIndex < totalLogicalBlocks);
-    bioPool[logicalBlockIndex].emplace_back(bio);
-    if (bioDeadline[logicalBlockIndex] == 0) {
-      bioDeadline[logicalBlockIndex] = currentTick + SCHEDULER_DEADLINE;
-    }
-    if (!writeScheduled) {
-      engine.scheduleEvent(schedulerEvent, getNextDeadline());
-    }
-  }
-}
-
-void NoopScheduler::invokeScheduler(uint64_t tick) {
-  const uint64_t currentTick = engine.getCurrentTick();
-
-  printf("[SCHEDULER] Invoke scheduler at %012ld\n", tick);
-
-  // Find first block with expired deadline
-  for (ulong i = 0; i < bioPool.size(); ++i) {
-    if (bioDeadline[i] != 0 && bioDeadline[i] <= currentTick) {
-      auto &pool = bioPool[i];
-
-      printf("[SCHEDULER] Committing %012ld writes from block %012ld\n",
-             pool.size(), i);
-      for (auto &bio : pool) {
-        pInterface->submitIO(bio);
-      }
-      pool.clear();
-      bioDeadline[i] = 0;
-      break;  // allow one read request before next block write
-    }
-  }
-
-  const uint64_t nextDeadline = getNextDeadline();
-  if (nextDeadline) {
-    engine.scheduleEvent(schedulerEvent, nextDeadline);
-  }
-  else {
-    writeScheduled = false;
-  }
-}
-
-uint64_t NoopScheduler::getNextDeadline() {
-  auto minDeadline = (uint64_t) -1;
-  for (const auto deadline : bioDeadline) {
-    if (deadline != 0 && deadline < minDeadline) {
-      minDeadline = deadline;
-    }
-  }
-
-  if (minDeadline == (uint64_t) -1) {
-    return 0;
-  }
-  return minDeadline;
+  pInterface->submitIO(bio);
 }
 
 }  // namespace BIL

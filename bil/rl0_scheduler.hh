@@ -19,23 +19,33 @@
 
 #pragma once
 
-#ifndef __BIL_NOOP_SCHEDULER__
-#define __BIL_NOOP_SCHEDULER__
+#ifndef __BIL_RL0_SCHEDULER__
+#define __BIL_RL0_SCHEDULER__
 
 #include "bil/scheduler.hh"
 
 namespace BIL {
 
-class NoopScheduler : public Scheduler {
+class RL0Scheduler : public Scheduler {
  public:
-  NoopScheduler(Engine &, DriverInterface *);
-  ~NoopScheduler();
+  RL0Scheduler(Engine &, DriverInterface *);
+  ~RL0Scheduler();
+
+  const uint64_t SCHEDULER_DEADLINE = 10UL * 1000UL * 1000UL;
 
   uint64_t totalLogicalBlocks = 3072;   // [NG] Sample config
   uint64_t logicalBlockSize = 3 << 27;  // [NG] Sample config
+  SimpleSSD::Event schedulerEvent;
+  std::vector<std::vector<BIO>> bioPool;
+  std::vector<uint64_t> bioDeadline;
+  bool writeScheduled = false;
 
   void init();
   void submitIO(BIO &);
+  void invokeScheduler(uint64_t);
+
+ private:
+  uint64_t getNextDeadline();
 };
 
 }  // namespace BIL
