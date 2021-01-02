@@ -23,6 +23,7 @@
 #define __BIL_NOOP_SCHEDULER__
 
 #include "bil/scheduler.hh"
+#include "queue"
 
 namespace BIL {
 
@@ -34,8 +35,22 @@ class NoopScheduler : public Scheduler {
   uint64_t totalLogicalBlocks = 3072;   // [NG] Sample config
   uint64_t logicalBlockSize = 3 << 27;  // [NG] Sample config
 
+  std::queue<BIO> queue;
+
+  const bool LIMIT_BUSYNESS = true;
+  const uint64_t BUSYNESS_THRESHOLD = 32;
+  ulong busy = 0;
+  std::mutex m;
+
+  const bool LOG_BLOCK_ADDRESS= true;
+  const char *BLOCK_ADDRESS_LOG_FILE = "./block_address.txt";
+  FILE *blockAddressLogFile;
+
   void init();
   void submitIO(BIO &);
+
+ private:
+  void _submitIO(BIO &);
 };
 
 }  // namespace BIL
