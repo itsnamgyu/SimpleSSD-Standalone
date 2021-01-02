@@ -63,6 +63,12 @@ class TraceReplayer : public IOGenerator {
   uint64_t completionLatency;
   uint32_t maxQueueDepth;  // Only used in MODE_ASYNC
 
+  // IO count
+  const char *IO_COUNT_LOG_FILE = "./io_count.txt";
+  const uint64_t IO_COUNT_LOG_INTERVAL = 1000L * 1000L;
+  SimpleSSD::Event ioCountLogEvent;
+  FILE *ioCountLogFile;
+
   bool useLBAOffset;
   bool useLBALength;
   uint32_t lbaSize;
@@ -91,6 +97,12 @@ class TraceReplayer : public IOGenerator {
   BIL::BIO_TYPE getType(std::string);
   void parseLine();
   void rescheduleSubmit(uint64_t);
+
+  /*
+   * Log io count to IO_COUNT_LOG_FILE
+   * Used to get stats the busy-ness of a given trace.
+   */
+  void logIOCount(uint64_t);
 
   struct TraceLine {
     uint64_t tick;

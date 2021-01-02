@@ -126,11 +126,21 @@ TraceReplayer::TraceReplayer(Engine &e, BIL::BlockIOEntry &b,
 
   completionEvent = [this](uint64_t id) { iocallback(id); };
 
+  // IO count log events
+  ioCountLogFile = fopen(IO_COUNT_LOG_FILE, "w");
+  ioCountLogEvent = engine.allocateEvent([this](uint64_t tick){
+    logIOCount(tick);
+    engine.scheduleEvent(ioCountLogEvent, tick + IO_COUNT_LOG_INTERVAL);
+  });
+  engine.scheduleEvent(ioCountLogEvent, engine.getCurrentTick() + IO_COUNT_LOG_INTERVAL);
+
   submitEvent = engine.allocateEvent([this](uint64_t) { submitIO(); });
 }
 
 TraceReplayer::~TraceReplayer() {
   file.close();
+  fclose(ioCountLogFile);
+  ioCountLogFile = NULL;
 }
 
 void TraceReplayer::init(uint64_t bytesize, uint32_t bs) {
@@ -378,6 +388,10 @@ void TraceReplayer::submitIO() {
     default:
       break;
   }
+}
+
+void TraceReplayer::logIOCount(uint64_t) {
+  fprintf(ioCountLogFile, "%ld\n", io_depth);
 }
 
 void TraceReplayer::iocallback(uint64_t) {
