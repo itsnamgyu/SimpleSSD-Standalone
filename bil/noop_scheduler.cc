@@ -29,7 +29,7 @@ NoopScheduler::NoopScheduler(Engine &e, DriverInterface *i) : Scheduler(e, i) {
   queue = std::queue<BIO>();
   if (LOG_BLOCK_ADDRESS) {
     blockAddressLogFile = fopen(BLOCK_ADDRESS_LOG_FILE, "w");
-    fprintf(blockAddressLogFile, "block,tick");
+    fprintf(blockAddressLogFile, "block,tick\n");
   }
 }
 
