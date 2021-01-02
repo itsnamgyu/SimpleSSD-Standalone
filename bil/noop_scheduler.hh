@@ -43,7 +43,7 @@ class NoopScheduler : public Scheduler {
   std::mutex m;
 
   const bool LOG_BLOCK_ADDRESS= true;
-  const char *BLOCK_ADDRESS_LOG_FILE = "./block_address.txt";
+  const char *BLOCK_ADDRESS_LOG_FILE = "./block_address.csv";
   FILE *blockAddressLogFile;
 
   void init();
